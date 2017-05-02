@@ -10,7 +10,7 @@
   <meta name="description" content="想用django做微信公众号后端。把学习的重点记录一下：">
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/python/web/2017/05/02/flask.html">
+  <link rel="canonical" href="http://localhost:4000/python/web/2017/05/02/django-wechat.html">
   <link rel="alternate" type="application/rss+xml" title="Bean&#39;s Blog" href="/feed.xml">
   
   
@@ -81,11 +81,11 @@
 
 <p>测试过程中出现了几个问题：</p>
 
-<p>1.django setting中的时区与Ubuntu的时区不一致。</p>
+<p>1.django setting中的时区与Ubuntu的时区不一致</p>
 
-<p>2.验证token时出现的sort()错误，request.GET.get(“signature”, None)改为request.GET.get(“signature”, ‘’)。</p>
+<p>2.验证token时出现的sort()错误，request.GET.get(“signature”, None)改为request.GET.get(“signature”, ‘’)</p>
 
-<p>3.hashlib.sha1验证时出现的编码错误，tmp_str = hashlib.sha1(tmp_str.encode(‘utf-8’)).hexdigest()。</p>
+<p>3.hashlib.sha1验证时出现的编码错误，tmp_str = hashlib.sha1(tmp_str.encode(‘utf-8’)).hexdigest()</p>
 
 <p>4.参考官方文档对POST进行回复，其中出现了“该公众号暂时无法提供服务，请稍后再试”</p>
 
