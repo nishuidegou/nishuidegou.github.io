@@ -263,7 +263,8 @@ public class MainActivity extends Activity implements OnTouchListener, CvCameraV
 }
 {% endhighlight %}
 
-参考 [opencv][opencv]   [讯飞][xunfei]
+参考 [opencv][opencv] [opencv][opencv2]  [讯飞][xunfei]
 
 [opencv]: https://www.learn2crack.com/2016/03/setup-opencv-sdk-android-studio.html
 [xunfei]: http://doc.xfyun.cn/msc_android/299548
+[opencv2]: http://people.oregonstate.edu/~robinsti/CS_496/Tutorial/#eight
