@@ -1,0 +1,17 @@
+---
+layout: post
+title:  "一些操作的提醒"
+date:   2017-07-18 14:14:48 +0800
+categories: 提醒
+---
+一些简单操作的提醒:
+* blog 测试运行：jekyll serve
+* github ：<br>
+&ensp; git add *<br>
+&ensp; git commit -m "提交信息"<br>
+&ensp; git push origin master<br>
+
+原文 [引用链接][引用链接]
+
+[引用链接]: http://www.bootcss.com/p/git-guide/
+

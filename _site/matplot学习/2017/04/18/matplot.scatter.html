@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>About</title>
-  <meta name="description" content="My little blog for technology.">
+  <title>matplot绘制动态散点图</title>
+  <meta name="description" content="使用matplot ‘scatter’绘制散点图:">
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://localhost:4000/about/">
+  <link rel="canonical" href="http://localhost:4000/matplot%E5%AD%A6%E4%B9%A0/2017/04/18/matplot.scatter.html">
   <link rel="alternate" type="application/rss+xml" title="Bean&#39;s Blog" href="/feed.xml">
   
   
@@ -64,17 +64,40 @@
 
     <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title">About</h1>
+    <h1 class="post-title" itemprop="name headline">matplot绘制动态散点图</h1>
+    <p class="post-meta">
+      <time datetime="2017-04-18T01:14:48+08:00" itemprop="datePublished">
+        
+        Apr 18, 2017
+      </time>
+      </p>
   </header>
 
-  <div class="post-content">
-    <p>从事技术工作很长时间，之前没有写blog的习惯，不过年龄增长，脑力下降，很多知识和操作记不住了，所以写写博客，一是提醒下自己，二是激励下自己。</p>
+  <div class="post-content" itemprop="articleBody">
+    <p>使用matplot ‘scatter’绘制散点图:</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></code></pre></figure>
+
+<p>可用于视频处理中某些特定点的追踪分析。</p>
+
+<p>原文 <a href="http://stackoverflow.com/questions/11874767/real-time-plotting-in-while-loop-with-matplotlib">引用链接</a></p>
+
 
   </div>
 
+  
 </article>
 
       </div>

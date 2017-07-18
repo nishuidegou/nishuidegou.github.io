@@ -6,11 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>matplot绘制动态散点图</title>
-  <meta name="description" content="使用matplot ‘scatter’绘制散点图:">
+  <title>一些操作的提醒</title>
+  <meta name="description" content="一些简单操作的提醒: blog 测试运行：jekyll serve github ：   git add *   git commit -m “提交信息”   git push origin master">
 
   <link rel="stylesheet" href="/assets/main.css">
-  <link rel="canonical" href="http://0.0.0.0:4000/matplot%E5%AD%A6%E4%B9%A0/2017/04/17/matplot.scatter.html">
+  <link rel="canonical" href="http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder.html">
   <link rel="alternate" type="application/rss+xml" title="Bean&#39;s Blog" href="/feed.xml">
   
   
@@ -67,32 +67,26 @@
         <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">matplot绘制动态散点图</h1>
+    <h1 class="post-title" itemprop="name headline">一些操作的提醒</h1>
     <p class="post-meta">
-      <time datetime="2017-04-17T10:14:48-07:00" itemprop="datePublished">
+      <time datetime="2017-07-18T14:14:48+08:00" itemprop="datePublished">
         
-        Apr 17, 2017
+        Jul 18, 2017
       </time>
       </p>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p>使用matplot ‘scatter’绘制散点图:</p>
+    <p>一些简单操作的提醒:</p>
+<ul>
+  <li>blog 测试运行：jekyll serve</li>
+  <li>github ：<br />
+  git add *<br />
+  git commit -m “提交信息”<br />
+  git push origin master<br /></li>
+</ul>
 
-<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span></code></pre></figure>
-
-<p>可用于视频处理中某些特定点的追踪分析。</p>
-
-<p>原文 <a href="http://stackoverflow.com/questions/11874767/real-time-plotting-in-while-loop-with-matplotlib">引用链接</a></p>
+<p>原文 <a href="http://www.bootcss.com/p/git-guide/">引用链接</a></p>
 
 
   </div>
