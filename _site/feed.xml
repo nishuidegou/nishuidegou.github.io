@@ -1,5 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-18T14:33:13+08:00</updated><id>http://localhost:4000/</id><title type="html">Bean’s Blog</title><subtitle>My little blog for technology.
-</subtitle><entry><title type="html">一些操作的提醒</title><link href="http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder.html" rel="alternate" type="text/html" title="一些操作的提醒" /><published>2017-07-18T14:14:48+08:00</published><updated>2017-07-18T14:14:48+08:00</updated><id>http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder</id><content type="html" xml:base="http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder.html">&lt;p&gt;一些简单操作的提醒:&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.4.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-28T16:13:09+08:00</updated><id>http://localhost:4000/</id><title type="html">Bean’s Blog</title><subtitle>My little blog for technology.
+</subtitle><entry><title type="html">nopcommerce学习笔记</title><link href="http://localhost:4000/nopcommerce/2017/07/28/nopcommerce.html" rel="alternate" type="text/html" title="nopcommerce学习笔记" /><published>2017-07-28T14:14:48+08:00</published><updated>2017-07-28T14:14:48+08:00</updated><id>http://localhost:4000/nopcommerce/2017/07/28/nopcommerce</id><content type="html" xml:base="http://localhost:4000/nopcommerce/2017/07/28/nopcommerce.html">&lt;p&gt;nopcommerce学习笔记:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;nopcommerce框架结构&lt;br /&gt;
+  * Libraries:&lt;br /&gt;
+   * Nop.Core&lt;br /&gt;
+   * Nop.Data&lt;br /&gt;
+   * Nop.Services&lt;br /&gt;
+  * Presentation:&lt;br /&gt;
+   * Nop.Admin&lt;br /&gt;
+   * Nop.Web&lt;br /&gt;
+   * Nop.Web.Framework&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;更新现有entity;添加新属性(property) ：&lt;br /&gt;
+  The data model&lt;br /&gt;
+  The presentation model&lt;br /&gt;
+  The view&lt;br /&gt;
+  The controller&lt;br /&gt;
+  Database(nopcommerce use code-first approach)&lt;br /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;注册新路由 ：&lt;br /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;设计指南(theme) ：&lt;br /&gt;
+ 添加新theme:&lt;br /&gt;
+  1.目录：root folder/Themes/,下载新的theme(.zip),并添加到该文件夹下&lt;br /&gt;
+  2.进入后台管理：www.yourdomin.com/admin&lt;br /&gt;
+  3.Configuration &amp;gt; Settings &amp;gt; General and Miscellaneous settings&lt;br /&gt;
+  4.添加新theme并保存&lt;br /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;原文 &lt;a href=&quot;http://docs.nopcommerce.com/display/en/Developers+guide&quot;&gt;引用链接&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">nopcommerce学习笔记: nopcommerce框架结构   * Libraries:    * Nop.Core    * Nop.Data    * Nop.Services   * Presentation:    * Nop.Admin    * Nop.Web    * Nop.Web.Framework</summary></entry><entry><title type="html">一些操作的提醒</title><link href="http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder.html" rel="alternate" type="text/html" title="一些操作的提醒" /><published>2017-07-18T14:14:48+08:00</published><updated>2017-07-18T14:14:48+08:00</updated><id>http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder</id><content type="html" xml:base="http://localhost:4000/%E6%8F%90%E9%86%92/2017/07/18/reminder.html">&lt;p&gt;一些简单操作的提醒:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;blog 测试运行：jekyll serve&lt;/li&gt;
   &lt;li&gt;github ：&lt;br /&gt;
@@ -16,12 +50,31 @@ package name | version | os version | description | installation&lt;/p&gt;
     &lt;h2 id=&quot;python-&quot;&gt;python :&lt;/h2&gt;
     &lt;p&gt;pyaudio:&lt;br /&gt;
   1. installation: install using conda install portaudio, then pip install pyaudio&lt;br /&gt;
-  2. version portaudio-19-0, ubuntu 16.04, python: anaconda python 3.6.0&lt;br /&gt;&lt;/p&gt;
+  2. version portaudio-19-0, ubuntu 16.04, python: anaconda python 3.6.0&lt;br /&gt;
+———————————&lt;br /&gt;
+pyttsx3:&lt;br /&gt;
+  1. installation: pip install pyttsx3&lt;br /&gt;
+  2. version pyttsx3-2.6, ubuntu 16.04, python: anaconda python 3.6.0&lt;br /&gt;
+———————————&lt;br /&gt;
+pyAudioAnalysis:&lt;br /&gt;&lt;/p&gt;
   &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;———————————&lt;br /&gt;
+pytorch:&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;———————————&lt;br /&gt;
+torchaudio:&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;———————————&lt;br /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
   &lt;li&gt;
     &lt;p&gt;c:&lt;/p&gt;
   &lt;/li&gt;
-  &lt;li&gt;django:&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;django:&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;原文 [引用链接][引用链接]&lt;/p&gt;
