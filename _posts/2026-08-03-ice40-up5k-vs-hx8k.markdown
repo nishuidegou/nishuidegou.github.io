@@ -1,0 +1,103 @@
+---
+layout: post
+title:  "iCE40UP5K vs iCE40-HX8K: A Practical Comparison"
+date:   2026-08-03 12:00:00 +0800
+categories: hardware
+---
+A side-by-side comparison of two popular Lattice iCE40 FPGAs — the low-power iCE40UP5K (UltraPlus) and the high-performance iCE40-HX8K (LP/HX) — with a real-world case study: porting RISCboy from HX8K to UP5K.
+
+## Chip Families
+
+These two chips belong to **different iCE40 sub-families**:
+
+| | **iCE40UP5K** | **iCE40-HX8K** |
+|---|---|---|
+| **Sub-family** | iCE40 UltraPlus | iCE40 LP/HX (High Performance) |
+| **Target** | Ultra-low power, edge AI | General purpose, high I/O |
+| **Process** | Advanced low-power | Standard |
+
+## Key Specs
+
+| Feature | **iCE40UP5K** | **iCE40-HX8K** |
+|---|---|---|
+| **Logic Cells (LUT4)** | 5,280 | 7,680 |
+| **Static Current** | 75 µA | 1,140 µA |
+| **EBR RAM (Block RAM)** | 120 kbits | 128 kbits |
+| **SPRAM (Single Port)** | 1,024 kbits (1 Mbit) | None |
+| **PLL** | 1 | 2 |
+| **DSP (16×16 MAC)** | 8 blocks | None |
+| **Hard I²C / SPI** | 2 / 2 cores | None |
+| **Oscillators** | 10 kHz + 48 MHz | None |
+| **PWM** | Yes | No |
+| **24 mA LED Driver** | 3 outputs | No |
+| **Max User I/O** | ~39 (QFN-48) | ~208 (caBGA-256) |
+| **Package Options** | WLCSP-30, QFN-48 | csBGA-132, ucBGA-225, caBGA-121, caBGA-256 |
+
+## Resource Tradeoffs
+
+The choice boils down to what matters most for your design:
+
+- **HX8K** gives you ~45% more logic cells and **far more I/O pins** (up to 208 vs 39). This makes it better for designs that need lots of external interfaces or pin-heavy peripherals.
+
+- **UP5K** consumes **15× less static current** (75 µA vs 1,140 µA), includes **1 Mbit of SPRAM** (HX8K has none), and packs hardened IP blocks (I²C, SPI, oscillators, PWM, DSP MACs). It is purpose-built for battery-powered edge AI, sensor fusion, and always-on applications.
+
+An important caveat: the UP5K's SPRAM is single-port and limited to one read or write per cycle. The HX8K's EBR blocks are dual-port and more flexible for pipelined designs. If your design requires dual-port memory without using logic cells, HX8K may be the better fit even with less total SRAM.
+
+## Case Study: Porting RISCboy from HX8K to UP5K
+
+[RISCboy](https://github.com/Wren6991/RISCBoy) is an open-source portable games console with a custom RISC-V CPU, raster graphics pipeline, and display controller — all written in synthesisable Verilog targeting the iCE40-HX8K.
+
+The project officially supports the **iCEBreaker board** (which carries a UP5K), but with significant compromises. From the [Icebreaker.mk](https://github.com/Wren6991/RISCBoy/blob/main/synth/Icebreaker.mk) build target:
+
+### HX8K Build (HX8k-EVN.mk)
+
+{% highlight makefile %}
+DEVICE        := hx8k
+PACKAGE       := ct256
+# Full RV32IMC ISA, 48 MHz clock, external 512 KiB SRAM
+{% endhighlight %}
+
+### UP5K Build (Icebreaker.mk)
+
+{% highlight makefile %}
+DEVICE        := up5k
+PACKAGE       := sg48
+# Reduced RV32I ISA, 12 MHz clock, internal 128 KiB SPRAM
+MARCH=rv32i CCFLAGS="-Os -DCLK_SYS_MHZ=12 -DFORCE_SRAM0_SIZE=131072"
+{% endhighlight %}
+
+### What Had to Change
+
+| Design Aspect | **HX8K** | **UP5K** |
+|---|---|---|
+| **CPU ISA** | RV32**IMC** (Full: Integer, Multiply, Compressed) | RV32**I** (Base integer only) |
+| **Clock Speed** | 48 MHz | 12 MHz |
+| **System RAM** | External 512 KiB SRAM (16-bit) | Internal SPRAM 128 KiB (32-bit) |
+| **M extension** | Hardware multiply/divide | Emulated in software |
+| **C extension** | 16-bit compressed instructions | 32-bit instructions only |
+
+### Why These Cuts?
+
+1. **LUT count**: HX8K has 7,680 LUTs vs UP5K's 5,280. Dropping the M and C extensions shrinks the CPU core significantly — the multiplier and divider alone consume substantial logic.
+
+2. **External memory bus**: HX8K's high pin count allows a 16-bit parallel SRAM interface. UP5K's QFN-48 package simply doesn't have enough I/O pins, so RISCboy falls back to the 1 Mbit on-chip SPRAM as system memory (configured to 128 KiB by forcing `SRAM0_SIZE=131072`).
+
+3. **Clock speed**: The tighter LUT budget on UP5K means higher utilisation, which makes timing closure harder. Running at 12 MHz instead of 48 MHz eases place-and-route pressure.
+
+The UP5K's DSP blocks (8 MAC units) could theoretically help with multiply operations, but RISCboy's M-extension removal was a design choice to save LUTs rather than a DSP mapping exercise.
+
+## Which One Should You Use?
+
+| Use Case | Recommended Chip |
+|---|---|
+| High I/O count, external memory | **iCE40-HX8K** |
+| Battery-powered, always-on | **iCE40UP5K** |
+| Edge AI / Neural Networks | **iCE40UP5K** |
+| RISC-V softcore with peripherals | **iCE40-HX8K** |
+| Sensor aggregation, protocol bridging | **iCE40UP5K** |
+
+Popular development boards:
+- **UP5K**: [iCEBreaker](https://1bitsquared.com/products/icebreaker), [UPduino](https://github.com/tinyvision-ai-inc/UPduino-v3.0), [TinyFPGA BX](https://tinyfpga.com/)
+- **HX8K**: [iCE40-HX8K Breakout Board](https://www.latticesemi.com/en/Products/DevelopmentBoardsAndKits/iCE40HX8KBreakoutBoard), [BlackIce Mx](https://mystorm.uk/)
+
+Both are fully supported by the open-source Icestorm toolchain (Yosys + nextpnr + icepack).
