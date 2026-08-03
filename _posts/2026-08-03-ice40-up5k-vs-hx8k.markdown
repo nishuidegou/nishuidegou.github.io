@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "iCE40UP5K vs iCE40-HX8K: A Practical Comparison"
-date:   2026-08-03 12:00:00 +0800
+date:   2026-08-03 10:00:00 +0800
 categories: hardware
 ---
 A side-by-side comparison of two popular Lattice iCE40 FPGAs — the low-power iCE40UP5K (UltraPlus) and the high-performance iCE40-HX8K (LP/HX) — with a real-world case study: porting RISCboy from HX8K to UP5K.
