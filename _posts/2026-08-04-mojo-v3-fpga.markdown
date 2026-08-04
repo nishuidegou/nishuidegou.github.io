@@ -1,0 +1,204 @@
+---
+layout: post
+title:  "Mojo V3 FPGA 开发板：资源、原理图与工具链"
+date:   2026-08-04 10:00:00 +0800
+categories: hardware
+---
+
+Mojo V3 是 Embedded Micro 出品的一款 FPGA 入门开发板，基于 Xilinx Spartan-6 XC6SLX9，搭配 ATmega32U4 作为 USB 桥接与配置控制器，整体设计非常适合初学者快速上手数字电路与 Verilog/Lucid 开发。本文整理该开发板的关键资源、硬件原理图要点和完整工具链使用方法。
+
+## 开发板规格速览
+
+| 组件 | 说明 |
+|---|---|
+| **FPGA** | Xilinx Spartan-6 XC6SLX9 (TQG144封装) |
+| **逻辑资源** | 5,720 个 LUT6 (每个 slice 含 4 个 LUT + 8 个 FF，共 1,430 slices) |
+| **Slice 类型** | SLICEX (~50%)、SLICEL (~25%)、SLICEM (~25%，LUT 可当 64bit RAM 或 32bit 移位寄存器用) |
+| **MCU** | ATmega32U4 (Arduino 兼容 bootloader，USB-串口桥接，FPGA 配置加载) |
+| **时钟** | 50MHz 板载晶振 |
+| **外设** | 8 个 LED、1 个复位按键、8 通道 ADC (通过 AVR 访问) |
+| **接口** | AVR-FPGA 间：1×SPI + 1×UART |
+| **IO** | 84 个可用 FPGA IO 引出到排针 |
+| **供电** | USB 供电或外部 5V |
+
+## 资源目录总览
+
+在离线资源包 (`download/`) 中整理了以下内容：
+
+### 数据手册与原理图
+- `MIC-05-006-FPGA SPARTAN 6-Datasheet.pdf` — Spartan-6 完整数据手册
+- `MIC-05-006-AtMega32u4-Datasheet.pdf` — ATmega32U4 数据手册
+- `MIC-05-006-Schematic.pdf` — Mojo V3 开发板原理图
+
+### 基础工程模板
+- `mojo-base-project-master/` — Verilog 基础工程 (Xilinx ISE 项目)，含 `avr_interface.v`、`spi_slave.v`、`serial_rx.v`、`serial_tx.v`、`cclk_detector.v` 等关键模块，以及 `mojo.ucf` 管脚约束文件
+- `syn/` 目录中预编译了 bitstream 和 netlist
+
+### 示例工程
+- `book-examples-master/` — 《Learning FPGAs》教材配套的 Lucid 语言示例 (ADC、Basic Processor、Hello RAM、Sound Locator、Stopwatch 等)
+- `FPGA-PWM-master.zip` — PWM 控制示例
+- `RegisterInterfaceExample.zip` — AVR-FPGA 寄存器接口示例
+
+### 离线教程 (`Tutorials-master/`)
+- **FPGA 入门指南** — 什么是 FPGA、FPGA 工作原理 (LUT、Slice、CLB、布线矩阵详解)
+- **基础电子学** — 电容、二极管、电感、电阻、三极管
+- **Verilog 教程** — Hello World、创建项目、同步逻辑、FSM、SPI、SDRAM、UART、PWM、Servos、测试平台编写、Core Generator 使用等
+- **Lucid 教程** — 首个 FPGA 工程、寄存器接口、基本 CPU、ROM 与 FSM、Camera、SDRAM 等
+- **项目实例** — 六足机器人 (Hexapod) + Blob Tracking
+- **软件与更新** — ISE 安装、Mojo IDE、Mojo Loader、Arduino IDE 设置、Bootloader 烧写
+
+## 原理图与硬件架构
+
+Mojo V3 的核心架构是 **FPGA + MCU 双芯片协作**模式：
+
+### AVR-FPGA 通信接口
+
+FPGA 和 ATmega32U4 之间通过两条总线连接：
+
+**1. SPI 接口 (寄存器读写)**
+
+| 信号 | 方向 | 说明 |
+|---|---|---|
+| `spi_sck` | AVR → FPGA | SPI 时钟 |
+| `spi_mosi` | AVR → FPGA | SPI 主机输出 |
+| `spi_miso` | FPGA → AVR | SPI 从机输出 |
+| `spi_ss` | AVR → FPGA | SPI 片选 |
+| `spi_channel[3:0]` | FPGA → AVR | ADC 通道选择 |
+
+**2. UART 串口**
+
+| 信号 | 方向 | 说明 |
+|---|---|---|
+| `avr_tx` | AVR → FPGA | 串口发送 |
+| `avr_rx` | FPGA → AVR | 串口接收 |
+| `avr_rx_busy` | AVR → FPGA | AVR 接收缓冲满 |
+
+此外还有一个关键控制信号 `cclk` (Configuration Clock)：AVR 在上电完成 FPGA 配置后将该信号拉高，FPGA 侧通过 `cclk_detector` 模块检测到后才开始驱动与 AVR 相连的 IO，避免总线竞争。
+
+### 管脚约束 (部分关键信号)
+
+以下摘自 `mojo.ucf`：
+
+{% highlight tcl %}
+NET "clk"  TNM_NET = clk;
+TIMESPEC TS_clk = PERIOD "clk" 50 MHz HIGH 50%;
+
+NET "clk"       LOC = P56  | IOSTANDARD = LVTTL;
+NET "rst_n"     LOC = P38  | IOSTANDARD = LVTTL;
+NET "led<0>"    LOC = P134 | IOSTANDARD = LVTTL;
+NET "led<1>"    LOC = P133 | IOSTANDARD = LVTTL;
+NET "led<2>"    LOC = P132 | IOSTANDARD = LVTTL;
+NET "led<3>"    LOC = P131 | IOSTANDARD = LVTTL;
+NET "led<4>"    LOC = P127 | IOSTANDARD = LVTTL;
+NET "led<5>"    LOC = P126 | IOSTANDARD = LVTTL;
+NET "led<6>"    LOC = P124 | IOSTANDARD = LVTTL;
+NET "led<7>"    LOC = P123 | IOSTANDARD = LVTTL;
+{% endhighlight %}
+
+### SPI 从机模块 (`spi_slave.v`)
+
+基工程中 `spi_slave.v` 实现了一个完整的 SPI 从机，支持 AVR 通过 SPI 读写 FPGA 内部寄存器。每次 SPI 事务完成时会产生 `done` 脉冲，同时 `dout` 上输出读取到的数据。这是 Mojo 上 AVR 和 FPGA 交互最核心的模块。
+
+### 串口收发模块
+
+`serial_rx.v` 和 `serial_tx.v` 以 500kbps 的波特率工作（在 50MHz 时钟下 `CLK_PER_BIT = 100`），为 FPGA 与上位机之间提供双向串口通信通道。
+
+## 工具链
+
+Mojo V3 的完整开发工具链由三部分组成：
+
+### 1. Xilinx ISE 14.7
+
+ISE 是 Xilinx 的 FPGA 综合与实现套件，这是 Mojo V3 开发的核心工具。安装包约 6.5GB，安装后约需 16GB 空间。使用 **ISE WebPACK** 免费版即可。
+
+ISC 内部流程：Synthesize (XST) → Translate (NGDBuild) → Map → Place & Route (PAR) → Generate Programming File (BitGen)。
+
+**Linux 注意项：**
+- 需要用 `sudo ./xsetup` 运行安装
+- 安装后创建启动脚本，在 ~20 行 bash 中 source `settings64.sh`
+- 首次运行需获取并安装免费 WebPACK License
+
+### 2. Mojo Loader
+
+Mojo Loader 是 Java SWT 编写的 bit 文件烧录工具。从 ISE 生成的 `.bin` 文件通过串口发送到 ATmega32U4，再由 AVR 写入 FPGA。
+
+**Linux 设置：**
+{% highlight bash %}
+sudo usermod -a -G dialout `whoami`
+# 将 99-mojo.rules 复制到 /etc/udev/rules.d/
+# 避免系统将 Mojo 识别为 modem
+{% endhighlight %}
+
+### 3. Alchitry Labs (可选)
+
+Alchitry Labs 1.2.7 是替代 ISE 的 IDE，提供更现代的 GUI 界面，内置 loader 工具，支持 Lucid 和 Verilog 两种语言。
+
+工具链目录 (`toolchain/`) 中已包含完整离线包：
+- `Xilinx_ISE_DS_Lin_14.7_1015_1/` — ISE 完整安装目录 (~6.2GB)
+- `mojo-loader-basic-loader/` — Mojo Loader 源码及预编译 JAR
+- `alchitry-labs-1.2.7-linux.tgz` — Alchitry Labs Linux 版
+
+## 快速上手：LED 闪烁
+
+以下是 `led_test/` 中的最小可运行示例。
+
+**顶层模块** (`mojo_top.v`)：
+
+{% highlight verilog %}
+`timescale 1ns / 1ps
+module mojo_top (
+    input clk,
+    input rst_n,
+    output [7:0] led
+);
+
+reg [24:0] counter_d, counter_q;
+wire rst = ~rst_n;
+
+assign led = {8{counter_q[24]}};
+
+always @(*) begin
+    counter_d = counter_q + 1'b1;
+end
+
+always @(posedge clk) begin
+    if (rst) begin
+        counter_q <= 25'd0;
+    end else begin
+        counter_q <= counter_d;
+    end
+end
+
+endmodule
+{% endhighlight %}
+
+用 25 位计数器分频 50MHz 时钟，最高位 (`counter_q[24]`) 翻转频率约 50MHz / 2^25 ≈ 1.49Hz，驱动 8 个 LED 同步闪烁。在 ISE 中双击 **Generate Programming File** 生成 bitstream，再用 Mojo Loader 选对应串口烧录即可。
+
+## 基工程架构 (`mojo-base-project`)
+
+完整的基工程包含以下 Verilog 源文件，是开发任何 Mojo 项目的起点：
+
+| 文件 | 功能 |
+|---|---|
+| `mojo_top.v` | 顶层模块，定义 FPGA 所有 IO 接口 |
+| `avr_interface.v` | AVR-FPGA 通信封装 (SPI slave + serial rx/tx + ADC + cclk detector) |
+| `spi_slave.v` | SPI 从机模块 |
+| `serial_rx.v` / `serial_tx.v` | 串口收发 |
+| `cclk_detector.v` | CCLK 就绪检测 |
+| `mojo.ucf` | 管脚约束文件 |
+
+此外还包含 `clk_divider.v`、`counter.v`、`d_ff.v`、`pwm.v`、`spi_master.v` 等常用模块及其 testbench，可直接复用。
+
+`avr_interface` 将 SPI 和 UART 统一封装，向上层用户模块暴露简易接口：
+- **寄存器读写**——FPGA 内 33bit `regIn` / 66bit `regOut`，由 AVR 通过 SPI 访问
+- **ADC 采样**——`channel`、`sample`、`new_sample`、`sample_channel` 信号
+- **串口 TX/RX**——`tx_data`、`new_tx_data`、`tx_busy`、`rx_data`、`new_rx_data`
+
+这种封装使得在 Mojo 上开发应用级 FPGA 逻辑几乎不需要关心底层 SPI/UART 时序。
+
+## 参考资料
+
+- Xilinx Spartan-6 系列资料：[UG384 - Spartan-6 FPGA Configurable Logic Block](https://www.xilinx.com/support/documentation/user_guides/ug384.pdf)
+- Mojo 基工程仓库：[github.com/embmicro/mojo-base-project](https://github.com/embmicro/mojo-base-project)
+- 《Learning FPGAs》配套示例：[github.com/embmicro/book-examples](https://github.com/embmicro/book-examples)
+- Alchitry Labs：[alchitry.com](https://alchitry.com)
