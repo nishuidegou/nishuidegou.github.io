@@ -1,0 +1,197 @@
+---
+layout: post
+title:  "在 Mojo V3 上运行 NEORV32 RISC-V 处理器"
+date:   2026-08-04 15:00:00 +0800
+categories: hardware
+---
+
+在 Mojo V3 FPGA (Xilinx Spartan-6 XC6SLX9) 上成功运行 NEORV32 v1.13.2 RISC-V 软核处理器，这是继上一篇文章介绍 Mojo 开发环境的后续实践。
+
+## 资源占用
+
+在 50MHz 时钟下，时序满足（9.2ns slack），资源利用率如下：
+
+| 资源 | 已用 | 总量 | % |
+|---|---|---|---|
+| Slice LUTs | 2,059 | 5,720 | 35% |
+| Slice Registers | 1,146 | 11,440 | 10% |
+| 16Kb BRAM | 7 | 32 | 21% |
+| 8Kb BRAM | 4 | 64 | 6% |
+| IOBs | 12 | 102 | 11% |
+
+Spartan-6 只用了三分之一的 LUT，还有充足空间扩展自定义外设。
+
+## CPU 配置
+
+| 参数 | 值 |
+|---|---|
+| ISA | RV32IC (含 `Zicsr`、`Zifencei` 扩展) |
+| IMEM | 8KB |
+| DMEM | 4KB |
+| BOOTROM | 4KB (bootloader) |
+| 外设 | UART0、GPIO、CLINT、SYSINFO |
+| 时钟 | 50MHz |
+| 启动模式 | Bootloader via UART |
+
+## 目录结构
+
+{% highlight text %}
+neorv32_test/
+├── mojo_top.v                     Mojo V3 顶层 wrapper
+├── mojo.ucf                       Spartan-6 管脚约束
+├── neorv32_mojo_wrapper_clean.v   24K 行——GHDL 转换的 NEORV32 Verilog
+├── neorv32_bootrom_rom.v          BOOTROM BRAM 模型
+├── neorv32_dmem_ram.v             DMEM BRAM 模型
+├── neorv32.prj                    XST 源文件列表
+├── synth.xst                      XST 综合脚本
+├── sw/
+│   ├── main.c                     LED 闪烁固件
+│   ├── makefile                   RISC-V GCC 编译脚本
+│   ├── main.elf                   ELF (含调试符号)
+│   ├── main.asm                   反汇编列表
+│   └── neorv32_exe.bin            可执行文件 (供 bootloader 上传)
+└── syn/
+    ├── neorv32_mojo.bit            FPGA bitstream
+    └── neorv32_mojo.bin            Mojo Loader 二进制
+{% endhighlight %}
+
+核心设计高度自包含：**只需要两个 Verilog 文件**（`mojo_top.v` + `neorv32_mojo_wrapper_clean.v`）即可完成综合。GHDL 转换后的文件将所有 CPU 逻辑、RAM 和外设嵌入为纯 Verilog-2001——无 VHDL 依赖、无 IP 核依赖。
+
+## 管脚映射
+
+| Mojo 引脚 | 信号 | 方向 |
+|---|---|---|
+| P56 | clk (50MHz) | input |
+| P38 | rst_n | input |
+| P134-P123 | led[7:0] | output (GPIO) |
+| P55 | avr_tx (UART RX) | input |
+| P59 | avr_rx (UART TX) | output |
+
+顶层 wrapper 仅 18 行 Verilog，直接实例化 NEORV32 wrapper：
+
+{% highlight verilog %}
+module mojo_top (
+    input  wire        clk,
+    input  wire        rst_n,
+    output wire [7:0]  led,
+    input  wire        avr_tx,
+    output wire        avr_rx,
+    input  wire        avr_rx_busy
+);
+
+    neorv32_mojo_wrapper u_neorv32 (
+        .clk_i        (clk),
+        .rstn_i       (rst_n),
+        .uart0_txd_o  (avr_rx),
+        .uart0_rxd_i  (avr_tx),
+        .gpio_o       (led)
+    );
+
+endmodule
+{% endhighlight %}
+
+## 固件：LED 闪烁
+
+固件使用 NEORV32 官方 BSP 编写，每隔 250ms 在 GPIO[7:0] 上递增 8 位计数器：
+
+{% highlight c %}
+#include <neorv32.h>
+
+int main() {
+    neorv32_gpio_port_set(0);
+    neorv32_gpio_dir_set(0x000000FF);
+
+    int cnt = 0;
+    while (1) {
+        neorv32_gpio_port_set(cnt++ & 0xFF);
+        neorv32_aux_delay_ms(neorv32_sysinfo_get_clk(), 250);
+    }
+    return 0;
+}
+{% endhighlight %}
+
+## 硬件测试流程
+
+### 1. 烧录 bitstream
+
+{% highlight bash %}
+java -jar mojo-loader.jar syn/neorv32_mojo.bin
+{% endhighlight %}
+
+### 2. 通过 UART 上传固件
+
+打开串口终端 (115200 8N1) 连接到 Mojo 的 UART 引脚。NEORV32 bootloader 会在终端打印提示符，上传 `sw/neorv32_exe.bin`。
+
+{% highlight bash %}
+picocom -b 115200 /dev/ttyACM0
+{% endhighlight %}
+
+### 3. 观察现象
+
+LED 将以 250ms 间隔递增闪烁，二进制计数器在 8 个板载 LED 上可见。
+
+## 完整 ISE 综合流程
+
+可以不通过 IDE 而使用命令行一步完成综合到 bitstream 生成：
+
+{% highlight bash %}
+source /opt/Xilinx/14.7/ISE_DS/settings64.sh
+cd neorv32_test
+
+# 综合
+xst -ifn synth.xst
+
+# 翻译
+ngdbuild -p xc6slx9-2-tqg144 -uc mojo.ucf syn/neorv32_mojo.ngc syn/neorv32_mojo.ngd
+
+# 映射
+map -p xc6slx9-2-tqg144 -w -o syn/neorv32_mojo_map.ncd syn/neorv32_mojo.ngd syn/neorv32_mojo.pcf
+
+# 布局布线
+par -w syn/neorv32_mojo_map.ncd syn/neorv32_mojo.ncd syn/neorv32_mojo.pcf
+
+# 生成 bitstream
+bitgen -w -g Binary:No -g Compress syn/neorv32_mojo.ncd syn/neorv32_mojo.bit syn/neorv32_mojo.pcf
+{% endhighlight %}
+
+## 重新生成 Verilog 核心
+
+NEORV32 原生是 VHDL，通过 GHDL 4.0+ 转换为纯 Verilog-2001 以便 Xilinx ISE 14.7 综合：
+
+{% highlight bash %}
+cd opencores/neorv32-verilog/src
+ghdl synth --std=08 --out=verilog neorv32_mojo_wrapper > neorv32_mojo_wrapper.v
+{% endhighlight %}
+
+需要 GHDL ≥ 4.0（OSS CAD Suite 已包含）。
+
+## 编译固件
+
+{% highlight bash %}
+export PATH=/path/to/riscv32/bin:$PATH
+cd sw
+make NEORV32_HOME=/path/to/neorv32
+{% endhighlight %}
+
+使用 RISC-V GCC 工具链编译。
+
+## 为什么选择 NEORV32 而非 SCR1
+
+最初尝试移植 SCR1 RISC-V 核到 Mojo V3 遇到了根本性问题：
+
+| 问题 | SCR1 | NEORV32 |
+|---|---|---|
+| 语言 | SystemVerilog (`'0`、`$clog2`、width casts)——XST 14.7 全部拒绝 | VHDL → 纯 Verilog-2001 (GHDL 转换)——零 SV 构造 |
+| 综合错误 | 需 30+ patch 才能通过 XST | **0 错误，一次通过** |
+| 启动 | EC_MIN 配置存在流水线竞态，首次取指时陷入 MTVEC | 从 BOOTROM 直接启动 |
+| 时序 | 未通过 50MHz (最高 34MHz) | **通过 50MHz**，9ns slack |
+| 工具链 | Python 手写 hex 编码 | 完整 GCC + BSP 库 |
+
+NEORV32 是生产级内核，在所有配置组合下经过充分验证。GHDL 的 Verilog 转换输出也干净适合综合。SCR1 的 EC_MIN 配置存在已知未解决的启动问题，在其自身的 README 中有记录。
+
+## 参考资料
+
+- [NEORV32 GitHub](https://github.com/stnolting/neorv32)
+- [GHDL Verilog 输出文档](https://ghdl.github.io/ghdl/using/Synthesis.html)
+- [OSS CAD Suite](https://github.com/YosysHQ/oss-cad-suite-build)
+- [Mojo 基工程](https://github.com/embmicro/mojo-base-project)
