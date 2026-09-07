@@ -1,0 +1,15 @@
+<footer class="site-footer h-card">
+  <div class="wrapper footer-inner">
+    <div class="footer-brand">
+      <p class="footer-title">{{ site.title | escape }}</p>
+      <p class="footer-desc">{{ site.description | escape }}</p>
+    </div>
+    <div class="footer-links">
+      {%- if site.github_username -%}
+      <a href="https://github.com/{{ site.github_username }}" rel="me">GitHub</a>
+      {%- endif -%}
+      <a href="{{ "/about/" | relative_url }}">About</a>
+      <a href="{{ "/feed.xml" | relative_url }}">RSS</a>
+    </div>
+  </div>
+</footer>

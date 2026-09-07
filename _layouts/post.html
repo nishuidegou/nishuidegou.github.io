@@ -1,0 +1,45 @@
+---
+layout: default
+---
+<article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <div class="post-header-meta">
+      <time class="dt-published" datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%B %-d, %Y" }}</time>
+      <span class="dot">&middot;</span>
+      <span>{%- assign minutes = page.content | number_of_words | divided_by: 200 | plus: 1 -%}{{ minutes }} min read</span>
+      {%- if page.categories.size > 0 -%}
+      <span class="dot">&middot;</span>
+      <span class="post-cat">{{ page.categories | first | replace: '-', ' ' | capitalize }}</span>
+      {%- endif -%}
+    </div>
+    <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    {{ content }}
+  </div>
+
+  {%- if site.disqus.shortname -%}
+    {%- include disqus_comments.html -%}
+  {%- endif -%}
+
+  <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
+</article>
+
+<nav class="post-pagination" aria-label="Post navigation">
+  <div class="pagination-inner">
+    {%- if page.previous -%}
+    <a class="pagination-card pagination-prev" href="{{ page.previous.url | relative_url }}">
+      <span class="pagination-label">&larr; Previous</span>
+      <span class="pagination-title">{{ page.previous.title | escape }}</span>
+    </a>
+    {%- endif -%}
+    {%- if page.next -%}
+    <a class="pagination-card pagination-next" href="{{ page.next.url | relative_url }}">
+      <span class="pagination-label">Next &rarr;</span>
+      <span class="pagination-title">{{ page.next.title | escape }}</span>
+    </a>
+    {%- endif -%}
+  </div>
+</nav>

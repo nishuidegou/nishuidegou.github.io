@@ -1,0 +1,61 @@
+---
+layout: default
+---
+
+<div class="home">
+  {{ content }}
+
+  {%- if site.posts.size > 0 -%}
+  <section class="hero">
+    <h1 class="hero-title">{{ site.title | escape }}</h1>
+    <p class="hero-subtitle">{{ site.description | escape }}</p>
+    <div class="hero-stats">
+      <span class="stat"><strong>{{ site.posts.size }}</strong>posts</span>
+      <span class="stat"><strong>{{ site.categories.size }}</strong>topics</span>
+      <span class="stat"><strong>
+        {%- assign total_words = 0 -%}
+        {%- for post in site.posts -%}
+          {%- assign words = post.content | number_of_words -%}
+          {%- assign total_words = total_words | plus: words -%}
+        {%- endfor -%}
+        {{ total_words -}}
+      </strong>words</span>
+    </div>
+  </section>
+
+  <section class="post-grid">
+    {%- for post in site.posts -%}
+    {%- assign cat_raw = post.categories | first -%}
+    {%- assign cat = cat_raw | downcase -%}
+    {%- case cat -%}
+      {%- when 'julia' -%}{%- assign cat_name = 'Julia' -%}
+      {%- when 'hardware' -%}{%- assign cat_name = 'FPGA & Hardware' -%}
+      {%- when 'underwater-acoustics' -%}{%- assign cat_name = 'Underwater Acoustics' -%}
+      {%- when 'android' -%}{%- assign cat_name = 'Android' -%}
+      {%- when 'python' -%}{%- assign cat_name = 'Python' -%}
+      {%- else -%}{%- assign cat_name = cat_raw | capitalize -%}
+    {%- endcase -%}
+    <article class="post-card{% if forloop.first %} post-card--feature{% endif %}">
+      <div class="post-card-meta">
+        {%- if cat_name.size > 0 -%}
+        <span class="post-cat">{{ cat_name }}</span>
+        {%- endif -%}
+        <time class="post-date" datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%b %-d, %Y" }}</time>
+      </div>
+      <h2 class="post-card-title">
+        <a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+      </h2>
+      {%- assign excerpt = post.excerpt | strip_html | strip_newlines | truncate: 180 -%}
+      {%- if excerpt.size > 0 -%}
+      <p class="post-card-excerpt">{{ excerpt }}</p>
+      {%- endif -%}
+      <div class="post-card-foot">
+        {%- assign minutes = post.content | number_of_words | divided_by: 200 | plus: 1 -%}
+        <span class="reading-time">{{ minutes }} min read</span>
+        <a class="read-more" href="{{ post.url | relative_url }}">Read more &rarr;</a>
+      </div>
+    </article>
+    {%- endfor -%}
+  </section>
+  {%- endif -%}
+</div>

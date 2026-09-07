@@ -1,7 +1,8 @@
 title: Bean's Blog
 email: your-email@domain.com
 description: >-
-  My little blog for technology.
+  Notes on underwater acoustics, signal processing, FPGAs and
+  open-source hardware — an engineering notebook.
 baseurl: ""
 url: "https://nishuidegou.github.io"
 twitter_username: nishuidegou
