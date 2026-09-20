@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  'MSP430FR6047 发射模块拆解：一串脉冲如何变成水里的声波'
-date:   2026-09-20 10:00:00 +0800
+date:   2026-09-20 09:00:00 +0800
 categories: embedded
 ---
 
