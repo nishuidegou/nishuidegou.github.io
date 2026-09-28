@@ -1,6 +1,6 @@
 ---
 layout: page
-title: 绘图脚本使用说明
+title: sketch-to-comic 使用说明
 permalink: /sketch-to-comic/usage/
 ---
 
