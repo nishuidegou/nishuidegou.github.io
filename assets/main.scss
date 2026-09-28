@@ -589,6 +589,197 @@ mjx-container svg use {
 }
 
 /* ==========================================================================
+   Comments
+   ========================================================================== */
+.comments {
+  max-width: 820px;
+  margin: 56px auto 0;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+}
+
+/* 站点没有全局 box-sizing，这里只在留言区内统一，避免输入框超出容器 */
+.comments *,
+.comments *::before,
+.comments *::after {
+  box-sizing: border-box;
+}
+
+.comments-title {
+  margin: 0 0 6px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.comment-form {
+  margin-top: 20px;
+}
+
+.comment-label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.comment-field {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.comment-field::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+.comment-field:focus {
+  outline: none;
+  border-color: var(--text);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.comment-textarea {
+  min-height: 108px;
+  resize: vertical;
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.comment-submit {
+  padding: 10px 22px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--selection-text);
+  background: var(--text);
+  border: 1px solid var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.comment-submit:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.comment-status {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.comment-note {
+  margin: 14px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.comment-list {
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.comment-list-title {
+  margin: 0 0 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.comment-count {
+  margin-left: 4px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.comment-items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.comment-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-item-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.comment-item-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.comment-item-time {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.comment-item-tag {
+  padding: 1px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-2);
+  border-radius: 999px;
+}
+
+.comment-item-body {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: var(--text-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-item-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.comment-item-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.comment-note--list {
+  margin-top: 20px;
+}
+
+/* ==========================================================================
    Footer
    ========================================================================== */
 .site-footer {

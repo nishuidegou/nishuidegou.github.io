@@ -1,0 +1,35 @@
+<section class="comments" id="comments"
+         data-repo="{{ site.comment_repo }}"
+         data-post="{{ page.url }}"
+         data-title="{{ page.title | escape }}">
+  <h2 class="comments-title">留言</h2>
+
+  <form class="comment-form" novalidate>
+    <label class="comment-label" for="comment-name">名称</label>
+    <input class="comment-field" id="comment-name" type="text" name="name"
+           maxlength="40" placeholder="你的名字" autocomplete="name" required>
+
+    <label class="comment-label" for="comment-body">内容</label>
+    <textarea class="comment-field comment-textarea" id="comment-body" name="body"
+              rows="4" maxlength="2000" placeholder="说点什么…" required></textarea>
+
+    <div class="comment-actions">
+      <button class="comment-submit" type="submit">提交留言</button>
+      <span class="comment-status" role="status" aria-live="polite"></span>
+    </div>
+
+    <p class="comment-note">
+      提交会跳转到 GitHub 的 Issue 页面，点「Submit new issue」即完成；留言公开保存在
+      <a href="https://github.com/{{ site.comment_repo }}/issues" target="_blank" rel="noopener">{{ site.comment_repo }}</a>。
+      <noscript>（需要启用 JavaScript 才能提交留言）</noscript>
+    </p>
+  </form>
+
+  <div class="comment-list" id="comment-list" hidden>
+    <h3 class="comment-list-title">已有留言<span class="comment-count"></span></h3>
+    <ul class="comment-items"></ul>
+  </div>
+  <p class="comment-note comment-note--list" id="comment-note" hidden></p>
+</section>
+
+<script src="{{ "/assets/comment.js" | relative_url }}?v=20260928-1" defer></script>

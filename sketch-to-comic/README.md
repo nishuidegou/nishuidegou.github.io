@@ -1,5 +1,8 @@
 # sketch-to-comic 使用说明
 
+> 同一份说明的网页版（含 `bend_site_selection.py`、`fluxgate_leakage.py` 两个博客配图脚本）：
+> <https://nishuidegou.github.io/sketch-to-comic/usage/>
+
 手绘草图 -> 漫画风格图片 / 激光雕刻矢量文件 的两组脚本。
 
 依赖：`python3` + `opencv-python` + `numpy`

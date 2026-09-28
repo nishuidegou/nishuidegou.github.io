@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -161,6 +163,7 @@ rule_box.text(0.03, 0.10, '③ 顺直段：两站连线斜跨断面，斜交角 
               '    使连线含沿流分量（cosα≠0）测量主流，并斜穿全断面采样',
               fontsize=10.5, color='#154360', va='top')
 
-fig.savefig('/home/magicbean/Projects/myblog/sketch-to-comic/bend_site_selection.png',
-            dpi=160)
-print('saved OK')
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUT = os.path.join(ROOT, 'assets', 'images', 'river-bend-tomography-sites-125deg.png')
+fig.savefig(OUT, dpi=160)
+print('saved', OUT)

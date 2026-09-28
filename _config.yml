@@ -8,6 +8,9 @@ url: "https://nishuidegou.github.io"
 twitter_username: nishuidegou
 github_username: nishuidegou
 
+# 留言功能：纯静态站点无后端，表单把「名称 + 内容」预填成该仓库的一条 Issue
+comment_repo: nishuidegou/nishuidegou.github.io
+
 permalink: /:categories/:year/:month/:day/:title/
 
 markdown: kramdown
