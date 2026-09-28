@@ -25,12 +25,7 @@
         <div class="trigger">
           {%- for path in page_paths -%}
             {%- assign my_page = site.pages | where: "path", path | first -%}
-            {%- comment -%}
-              /sketch-to-comic/ 是 GitHub Pages 的 jekyll-readme-index 插件把
-              sketch-to-comic/README.md 渲染出来的页面，内容和 /sketch-to-comic/usage/
-              重复，所以导航里只保留 usage/ 这一份。
-            {%- endcomment -%}
-            {%- if my_page.title and my_page.url != '/sketch-to-comic/' -%}
+            {%- if my_page.title -%}
             <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
             {%- endif -%}
           {%- endfor -%}
