@@ -64,7 +64,7 @@ Bellhop 的 `beam_type` 构造器只接受 `:geometric`（写 `'G'`）和 `:gaus
 
 ### 一个真正的惊喜：纯 Julia 端口复现了 Fortran 内核
 
-`BellhopJL` / `KrakenJL` 是作者自己做的原生 Julia 移植，理论上最容易出偏差。实测同一个算例（常深 12 m，刚性底，\(c=1450\) m/s，\(T=15\) °C，\(S=0\)，300 Hz，源 \((0,-3)\)，接收点 \((200,-6)\)）：
+`BellhopJL` / `KrakenJL` 是作者自己做的原生 Julia 移植，理论上最容易出偏差。实测同一个算例（常深 12 m，刚性底，$c=1450$ m/s，$T=15$ °C，$S=0$，300 Hz，源 $(0,-3)$，接收点 $(200,-6)$）：
 
 | 模型 | TL | 到达/模态数 | 耗时 | 与 Bellhop 之差 |
 |------|----|-----------|------|--------------|
@@ -87,7 +87,7 @@ Bellhop 的 `beam_type` 构造器只接受 `:geometric`（写 `'G'`）和 `:gaus
 - `Bellhop` 是**波束法**——每根束代表一族射线，能高效求声场，但"到达"是波束交点反推出来的。
 - `RaySolver` 是**动态光线积分**（SciML：`OrdinaryDiffEq` + `NonlinearSolve`），逐条积分带符号距离的事件方程。
 
-结果是 `RaySolver` 给出的 `RayArrival` 带**完整路径点序列** `path`，可以画出每一条多径的折线；到达时刻也和 `Bellhop` 完全对得上。实测同一算例（常深 12 m、淤泥床、\(f_s=8\) kHz 冲激响应）：
+结果是 `RaySolver` 给出的 `RayArrival` 带**完整路径点序列** `path`，可以画出每一条多径的折线；到达时刻也和 `Bellhop` 完全对得上。实测同一算例（常深 12 m、淤泥床、$f_s=8$ kHz 冲激响应）：
 
 | k | `ns` | `nb` | `RaySolver` 走时 | `Bellhop` 走时 | Δt |
 |---|-----|-----|----------------|---------------|-----|
@@ -102,7 +102,7 @@ Bellhop 的 `beam_type` 构造器只接受 `:geometric`（写 `'G'`）和 `:gaus
 
 前 8 条最强多径的走时**逐位相同**（总数 22 vs 16，差别在弱路径的截断阈值上）。
 
-**但绝对声强对不上。** 12 m 等深、\(c=1450\) m/s、淤泥床，扫频率（全部取非相干 TL）：
+**但绝对声强对不上。** 12 m 等深、$c=1450$ m/s、淤泥床，扫频率（全部取非相干 TL）：
 
 | 频率 | `Bellhop` | `BellhopJL` | `Kraken` | `RaySolver` | `RaySolver` 偏差 |
 |------|-----------|------------|----------|------------|----------------|
@@ -114,7 +114,7 @@ Bellhop 的 `beam_type` 构造器只接受 `:geometric`（写 `'G'`）和 `:gaus
 
 另外三个模型的非相干 TL 在 5 个频点上稳定在 35.6 dB（彼此差 0.09 dB 以内），`RaySolver` 却一路跳动。**结论很清楚：`RaySolver` 用来看走时和到达结构是可靠的，用来做绝对声强不可靠。** 这不奇怪——动态光线法要算严格的几何扩散和每条路径的透镜/反射系数，任何一处幅度约定不一致都会整体偏移，而到达时刻对幅度约定不敏感。
 
-还有一个**弹性床面的行为差异**：给 `RaySolver` 配 `ElasticBoundary`（带剪切波速度）时，它会打印 `Warning: Fluid-solid reflection not implemented, ignoring shear...`，然后**丢掉剪切波继续算**；而 `Bellhop` 和 `Kraken` 是真的按弹性界面算的。实测淤泥弹性底（\(\rho=1750\)、\(c_p=1700\)、\(c_s=25\) m/s、\(\delta=0.5\)）在 200 m 处：`Bellhop` 38.39 dB、`Kraken` 38.53 dB、`RaySolver` 40.58 dB。**要严格处理弹性界面就别用 `RaySolver`。**
+还有一个**弹性床面的行为差异**：给 `RaySolver` 配 `ElasticBoundary`（带剪切波速度）时，它会打印 `Warning: Fluid-solid reflection not implemented, ignoring shear...`，然后**丢掉剪切波继续算**；而 `Bellhop` 和 `Kraken` 是真的按弹性界面算的。实测淤泥弹性底（$\rho=1750$、$c_p=1700$、$c_s=25$ m/s、$\delta=0.5$）在 200 m 处：`Bellhop` 38.39 dB、`Kraken` 38.53 dB、`RaySolver` 40.58 dB。**要严格处理弹性界面就别用 `RaySolver`。**
 
 ### `RaySolver` 的性能是个真问题
 
@@ -199,11 +199,11 @@ AdiabaticExt(Orca, env)
 
 ## 六、弯河段怎么办：`Reframe2D` 的真实边界
 
-内河平面曲率大（上文那篇急弯算例 \(R/B \approx 2.5\)），而所有这些模型都是 x–z 竖直面模型。`Reframe2D` 就是为这件事准备的：把声源平移旋转到原点、把环境一起变换，让一条弯曲测线能被 2D 模型处理。
+内河平面曲率大（上文那篇急弯算例 $R/B \approx 2.5$），而所有这些模型都是 x–z 竖直面模型。`Reframe2D` 就是为这件事准备的：把声源平移旋转到原点、把环境一起变换，让一条弯曲测线能被 2D 模型处理。
 
 **但它有一个文档没写清、实测才暴露的限制：接收点必须与声源共面。**
 
-实测 \(R = 1500\) m、转角 40°、随程水深 + 随程 SSP 的弯河段：
+实测 $R = 1500$ m、转角 40°、随程水深 + 随程 SSP 的弯河段：
 
 | 做法 | 结果 |
 |------|------|
@@ -216,7 +216,7 @@ AdiabaticExt(Orca, env)
 `atol` 默认只有 0.1 m，而弯河段上偏离源点所在竖直平面的距离能到 **79.2 m**——差 792 倍，所以调 `atol` 是没有意义的，正确做法只有两条：
 
 1. **逐接收点单独跑**（库自己在报错里就是这么建议的）。每个点单独构造 `Reframe2D(Bellhop, env)` 并只传一个 `AcousticReceiver`，实测 5 个点共 **8.17 s**，得到 44.41 / 51.11 / 63.95 / 72.95 / 58.47 dB。顺带说明：**两个接收点时 `Reframe2D` 一定不会报错**（三点定面），所以只布两站的层析方案走这条路没问题，一旦布成弧形多站就会撞墙。
-2. **按弧长把河段"拉直"**：以中心线弧长 \(s\) 为横坐标建环境（随程水深、随程 SSP 都按 \(s\) 索引），测线两端按各自的弧长位置放。这本来就是二维声学模型对弯曲河道的标准近似。
+2. **按弧长把河段"拉直"**：以中心线弧长 $s$ 为横坐标建环境（随程水深、随程 SSP 都按 $s$ 索引），测线两端按各自的弧长位置放。这本来就是二维声学模型对弯曲河道的标准近似。
 
 ## 七、一套能直接抄的内河建模流程
 
@@ -226,15 +226,15 @@ AdiabaticExt(Orca, env)
 2. **建环境**：`bathymetry` 填**正水深**；随程水深用 `SampledField(h(s); x=s)`；随程 SSP 用 `SampledField(matrix; x, z)`，注意**矩阵是 x-major**（第 1 维 x、第 2 维 z），`x` 要铺到最远接收点之外，**接收点网格不要含 `x = 0`**。`salinity = 0`、`soundspeed` 显式给淡水值。**打印一次环境，确认水深是正数、采样数非零。**
 3. **选模型**：需要随程水深 + 随程 SSP → `Bellhop`（要可微/免文件 I/O 就 `BellhopJL`，但常深才行）；要严格模态 → `AdiabaticExt(Kraken, env)`；要逐条多径路径和精确走时 → `RaySolver`（少量接收点）；要快速敏感性扫描 → `PekerisRayTracer`（只看趋势）。
 4. **定声学量**：`transmission_loss` / `arrivals` / `acoustic_field` / `channel` 四个入口对所有模型统一，**但 TL 一律显式传 `mode=:incoherent`**（实测 500 Hz–5 kHz 稳定在 35.6 dB，而默认的相干结果在 32.7–47.1 dB 之间乱跳）。`Kraken` 的 `clow` / `chigh` 默认 1300 / 2500 是给海洋调的，浅水河里建议收紧到实际声速附近。
-5. **水体吸收**：`absorption(f, 1.0, S, T, d, pH)` 返回的是**比值不是 dB**，要自己 `-20log10(...)×1000`。而且 Francois–Garrison 是海水模型，\(S=0\) 时吸收几乎全部退场（300 Hz 淡水 0.00002 dB/km vs 海水 0.0057 dB/km，差 245 倍），**内河的悬沙衰减只能外部标定后在 TL 上叠加**。这一步别省。
+5. **水体吸收**：`absorption(f, 1.0, S, T, d, pH)` 返回的是**比值不是 dB**，要自己 `-20log10(...)×1000`。而且 Francois–Garrison 是海水模型，$S=0$ 时吸收几乎全部退场（300 Hz 淡水 0.00002 dB/km vs 海水 0.0057 dB/km，差 245 倍），**内河的悬沙衰减只能外部标定后在 TL 上叠加**。这一步别省。
 6. **交叉验证**（最省事也最有效的一步）：同一个算例至少跑两个模型。本文里 `Bellhop` / `BellhopJL` / `Kraken` / `Orca` 的非相干 TL 差 0.09 dB 以内，三个射线实现对随程河床差 0.00 dB——**一旦某个模型偏离十几 dB，你立刻知道该怀疑谁。**
 7. **补二维限制**：柱面 → 球面展布的 3–6 dB 修正，加一次"对建模面选取的敏感性分析"。这是弥补没有三维模型唯一有效的手段。
 
 ## 八、几个值得单独记住的坑
 
 1. **`absorption` 返回比值不是 dB。** 直接 `println(absorption(300.0))` 打出 `0.9999981`，看起来像"约 1 dB"，真实值是 0.0057 dB/km，差 200 倍。
-2. **Fortran 内核的自动微分会静默返回零梯度。** 对水深求 \(\partial\mathrm{TL}/\partial h\)：`PekerisModeSolver` 给 −179.13996（差分 −179.13990，完全一致）、`PekerisRayTracer` 给 −0.70577（一致）、`RaySolver` 给 −226.11（差分 −217.99，差 3.7%），而 `Bellhop` 和 `Kraken` 都给 **精确的 0.0**。原因是 `Dual` 要写进 `.env` 文本文件，落盘前就被截成 `Float64`。**不报错，梯度下降会以为目标函数是常数而第一步就"收敛"。** 用 Fortran 版就必须上有限差分，并且每次拿中心差分验证。
-3. **`BellhopJL` 的可微性只对源深成立。** \(\partial\mathrm{TL}/\partial z_{src}\)：AD 给 −2.489206549729791，中心差分给 −2.4892065551895826，9 位有效数字吻合；但对水深直接给 `NaN`。
+2. **Fortran 内核的自动微分会静默返回零梯度。** 对水深求 $\partial\mathrm{TL}/\partial h$：`PekerisModeSolver` 给 −179.13996（差分 −179.13990，完全一致）、`PekerisRayTracer` 给 −0.70577（一致）、`RaySolver` 给 −226.11（差分 −217.99，差 3.7%），而 `Bellhop` 和 `Kraken` 都给 **精确的 0.0**。原因是 `Dual` 要写进 `.env` 文本文件，落盘前就被截成 `Float64`。**不报错，梯度下降会以为目标函数是常数而第一步就"收敛"。** 用 Fortran 版就必须上有限差分，并且每次拿中心差分验证。
+3. **`BellhopJL` 的可微性只对源深成立。** $\partial\mathrm{TL}/\partial z_{src}$：AD 给 −2.489206549729791，中心差分给 −2.4892065551895826，9 位有效数字吻合；但对水深直接给 `NaN`。
 4. **`Kraken` 在 12 m 浅水里做 5 kHz 冲激响应会崩。** `transmission_loss` 还能算（67 阶模），但 `channel` / `impulse_response` 触发 `Failure to converge in RootFinderSecant`，然后 `STOP Fatal Error`。模态根求解器在浅水高频下本来就吃力。**浅水高频河段别指望模态解的冲激响应。**
 5. **接收点别放 `x = 0`。** Bellhop 在零距离返回 `+Inf` dB，会把整个统计量污染掉。
 6. **`SampledField` 的矩阵是 x-major。** 和图像处理的直觉相反，写反报 `knot vectors must have the same axes as the corresponding dimension of the array`。
